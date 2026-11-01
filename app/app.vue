@@ -26,7 +26,7 @@ watch(open, (value) => {
             class="inline-flex items-center text-xl font-bold space-x-2"
           >
             <div class="text-blue-600">КАДРОВАЯ</div>
-            <div class="text-red-600">БЕЗОПАСНОСТЬ</div>
+            <div class="text-red-600">СЛУЖБА</div>
           </div>
         </NuxtLink>
       </template>
