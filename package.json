@@ -1,0 +1,24 @@
+{
+  "name": "Person-Content",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/content": "3.16.2",
+    "@nuxt/ui": "^4.12.0",
+    "nuxt": "^4.6.3",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.150",
+    "@nuxt/eslint": "^1.17.0",
+    "@nuxt/eslint-config": "^1.17.0",
+    "eslint": "^10.14.0",
+    "vue-tsc": "^3.3.14"
+  }
+}
