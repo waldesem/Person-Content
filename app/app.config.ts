@@ -5,5 +5,8 @@ export default defineAppConfig({
       secondary: "purple",
       neutral: "zinc",
     },
+    pageHeader: {
+      slots: { root: "relative border-none py-12" },
+    },
   },
 });

@@ -1,36 +1,36 @@
 # Person Content
 
-Контент-сайт с краткими биографиями топ-менеджмента банка.
+Контент-сайт с краткими биографиями топ-менеджмента.
 Персоны разделены на грейды **А+**, **А** и **B**.
 Rаждый грейд — отдельная коллекция Markdown-файлов, управляемая через [Nuxt Content](https://content.nuxt.com).
 
 ## Стек
 
 - [Nuxt 4](https://nuxt.com) — фреймворк (SSR + prerender главной страницы)
-- [@nuxt/content 3](https://content.nuxt.com) — контент-слой на Markdown с SQLite-базой
-- [@nuxt/ui 4](https://ui.nuxt.com) — компоненты (`UPage`, `UPageCard`, `UPageSection` и т.д.)
+- [@nuxt/content 3](https://content.nuxt.com) — контент на Markdown с SQLite-базой
+- [@nuxt/ui 4](https://ui.nuxt.com) — компоненты
 - [Tailwind CSS 4](https://tailwindcss.com) — стилизация
+- [Valibot](https://valibot.dev) - схемы коллекций
 - [Bun](https://bun.sh) — пакетный менеджер и рантайм
-- ESLint (@nuxt/eslint, стилистический конфиг) и vue-tsc — качество кода
 
 ## Структура проекта
 
 ```
 ├── app/
-│   ├── assets/css/main.css     # Глобальные стили
-│   ├── app.config.ts           # Конфигурация приложения (тема Nuxt UI)
-│   ├── app.vue                 # Корневой компонент
+│   ├── assets/css/main.css         # Глобальные стили
+│   ├── app.config.ts               # Конфигурация приложения (тема Nuxt UI)
+│   ├── app.vue                     # Корневой компонент
 │   └── pages/
-│       ├── index.vue           # Главная: выбор грейда (А+, А, B)
-│       ├── grade/[slug].vue    # Список персон грейда (slug = a | b | plus)
-│       └── [...slug].vue       # Страница биографии конкретной персоны
+│       ├── index.vue               # Главная: выбор грейда (А+, А, B)
+│       ├── grade/[collection].vue  # Список персон грейда (collection = a | b | plus)
+│       └── [collection]/[name].vue # Страница биографии конкретной персоны
 ├── content/
-│   └── plus/                   # Коллекция «plus»: биографии грейда А+
+│   └── plus/                       # Коллекция «plus»: биографии грейда А+
 │       └── 1.morozova.md
 ├── public/
-│   └── plus/                   # Фотографии персон (public/<collection>/<slug>.png)
-├── content.config.ts           # Определение коллекций контента (a, b, plus)
-└── nuxt.config.ts              # Конфигурация Nuxt
+│   └── plus/                       # Фотографии персон (public/<collection>/<name>.png)
+├── content.config.ts               # Определение коллекций контента (a, b, plus)
+└── nuxt.config.ts                  # Конфигурация Nuxt
 ```
 
 ## Коллекции контента
@@ -54,7 +54,7 @@ description: "Должность, короткое описание"
 date: 2026-11-01
 ---
 
-<img src="/plus/<slug>.png" width="200" height="100" alt="">
+<img src="/plus/<name>.png" width="200" height="auto" alt="">
 
 # Фамилия Имя Отчество
 
@@ -67,16 +67,16 @@ date: 2026-11-01
 - ...
 ```
 
-Фотография персоны кладётся в `public/<collection>/<slug>.png` и автоматически подставляется в карточку на странице грейда.
+Фотография персоны кладётся в `public/<collection>/<name>.png` и автоматически подставляется в карточку на странице грейда.
 
 ## Запуск
 
-Требуется [Bun](https://bun.sh) (или Node.js 20+).
+Требуется [Bun](https://bun.sh) (или Node.js 24+).
 
 ```bash
 # Клонирование репозитория
 git clone https://github.com/waldesem/Person-Content.git
-cd person-content
+cd Person-Content
 # Установка зависимостей
 bun install
 
@@ -101,14 +101,12 @@ node .output/server/index.mjs
 
 ## Добавление новой персоны
 
-1. Создайте файл `content/<коллекция>/<номер>.<slug>.md` с frontmatter (`title`, `description`, `date`) и текстом биографии.
-2. Добавьте фотографию `public/<коллекция>/<slug>.png`.
+1. Создайте файл `content/<collection>/<номер>.<name>.md` с frontmatter (`title`, `description`, `date`) и текстом биографии.
+2. Добавьте фотографию `public/<collection>/<name>.png`.
 3. Персона автоматически появится в списке соответствующего грейда.
 
 ## Разработка
 
-- **Линт**: ESLint настроен через `@nuxt/eslint` со стилистическими правилами (без висячих запятых, стиль скобок `1tbs`).
-- **Nuxt DevTools** включены в режиме разработки.
 - База контента — SQLite (переменная окружения `SQLITE_DB_LOCATION`).
 
 ## Скриншоты

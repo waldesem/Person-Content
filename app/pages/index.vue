@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PageFeatureProps } from "@nuxt/ui";
 
+// Главная страница с грейдами
 const features = ref<PageFeatureProps[]>([
   {
     title: "Грейд А+",
@@ -24,15 +25,12 @@ const features = ref<PageFeatureProps[]>([
 </script>
 
 <template>
-  <UContainer>
-    <UPage>
-      <UPageSection
-        class="pt-16"
-        icon="i-lucide-user-group"
-        title="Топ-менеджент Банка"
-        description="Краткая биография руководителей верхнего уровня"
-        :features="features"
-      />
-    </UPage>
+  <UContainer class="my-[20vh]">
+    <UPageSection
+      icon="i-lucide-user-group"
+      title="Топ-менеджент"
+      description="Краткая биография руководителей"
+      :features="features"
+    />
   </UContainer>
 </template>

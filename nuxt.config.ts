@@ -5,25 +5,25 @@ export default defineNuxtConfig({
         { name: "viewport", content: "width=device-width, initial-scale=1" },
       ],
       link: [{ rel: "icon", href: "/favicon.ico" }],
-      htmlAttrs: {
-        lang: "ru",
-      },
+      htmlAttrs: { lang: "ru" },
     },
 
     pageTransition: { name: "page", mode: "out-in" },
   },
 
-  modules: ["@nuxt/eslint", "@nuxt/ui", "@nuxt/content"],
+  modules: ["@nuxt/eslint", "@nuxt/ui", "@nuxt/content", "@nuxt/image"],
 
   devtools: {
     enabled: true,
   },
 
-  build: {
-    analyze: true,
-  },
-
   css: ["~/assets/css/main.css"],
+
+  icon: {
+    clientBundle: {
+      scan: true,
+    },
+  },
 
   routeRules: {
     "/": { prerender: true },
@@ -35,15 +35,6 @@ export default defineNuxtConfig({
     database: {
       type: "sqlite",
       filename: "SQLITE_DB_LOCATION",
-    },
-  },
-
-  eslint: {
-    config: {
-      stylistic: {
-        commaDangle: "never",
-        braceStyle: "1tbs",
-      },
     },
   },
 });
