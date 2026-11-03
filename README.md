@@ -114,3 +114,4 @@ node .output/server/index.mjs
 <img src="screenshots/screenshot-1.png" width="100%" alt="Скриншот 1">
 <img src="screenshots/screenshot-2.png" width="100%" alt="Скриншот 2">
 <img src="screenshots/screenshot-3.png" width="100%" alt="Скриншот 3">
+<img src="screenshots/screenshot-4.png" width="100%" alt="Скриншот 4">

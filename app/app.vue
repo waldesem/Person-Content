@@ -4,7 +4,7 @@ useHead({
   description: "Приложение для просмотра управленческого состава организации",
 });
 
-// используем useSearchCollection для поиска по содержимому
+// поиск по содержимому
 const { search, status, init } = useSearchCollection(["a", "b", "plus"], {
   immediate: false,
 });
@@ -25,11 +25,8 @@ watch(open, (value) => {
     <UHeader>
       <template #left>
         <NuxtLink to="/" title="Главная страница">
-          <div
-            v-once
-            class="inline-flex items-center text-2xl font-bold space-x-1"
-          >
-            <div class="text-blue-600">Staff</div>
+          <div class="inline-flex items-center text-2xl font-bold space-x-1">
+            <div class="text-primary-600">Staff</div>
             <div class="text-red-600">Sec</div>
           </div>
         </NuxtLink>
