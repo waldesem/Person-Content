@@ -1,22 +1,39 @@
 <script setup lang="ts">
 import type { Collections } from "@nuxt/content";
 
-const route = useRoute();
+const titles: Record<keyof Collections, string> = {
+  plus: "А+",
+  a: "А",
+  b: "B",
+};
 
-// получаем грейд из роута
-const coll = computed(() => route.params.collection as keyof Collections);
+// определяем получение параметра роута через пропс и валидируем его
+definePageMeta({
+  props: true,
+  validate: (route) => {
+    const collParam = route.params.collection as string;
+    return collParam in titles;
+  },
+});
+
+// получаем параметры роута черех пропсы
+const { collection } = defineProps<{ collection: keyof Collections }>();
+
+// формируем имя грейда
+const graid = computed(() => {
+  return "Грейд " + titles[collection];
+});
+
+// заголовок страницы
+useHeadSafe({ title: graid.value });
 
 // получаем список карточек из коллекции
-const { data } = await useAsyncData(() => queryCollection(coll.value).all());
-
-const titles = { plus: "А+", a: "А", b: "B" };
-
-useHeadSafe({ title: "Грейд " + titles[coll.value] });
+const { data } = await useAsyncData(() => queryCollection(collection).all());
 </script>
 
 <template>
   <UContainer>
-    <UPageHeader :title="'Грейд ' + titles[coll]" />
+    <UPageHeader :title="graid" />
     <UPageGrid>
       <UPageCard
         v-for="(card, index) in data"

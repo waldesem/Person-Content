@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import type { Collections } from "@nuxt/content";
 
-const route = useRoute();
+// определяем получение параметров роута через пропсы
+definePageMeta({ props: true });
 
-// получаем грейд из роута
-const coll = computed(() => route.params.collection as keyof Collections);
-
-// получаем имя из роута
-const name = computed(() => route.params.name as string);
+// получаем параметры роута черех пропсы
+const { collection, name } = defineProps<{
+  collection: keyof Collections;
+  name: string;
+}>();
 
 // получаем данные из коллекции
-const { data } = await useAsyncData(`${coll.value}-${name.value}`, () =>
-  queryCollection(coll.value).path(`/${coll.value}/${name.value}`).first(),
+const { data } = await useAsyncData(`${collection}-${name}`, () =>
+  queryCollection(collection).path(`/${collection}/${name}`).first(),
 );
 
 // проверяем, существует ли страница
@@ -28,11 +29,12 @@ useHeadSafe({ title: data.value?.title || "Страница не найдена"
 
 <template>
   <UContainer>
-    <UPage class="pt-8">
-      <ContentRenderer v-if="data" :value="data" />
+    <UPage v-if="data" class="py-8">
+      <ContentRenderer :value="data" />
       <template #right>
-        <UContentToc title="Содержание" :links="data?.body?.toc?.links" />
+        <UContentToc title="Содержание" :links="data.body.toc?.links" />
       </template>
+      <NuxtTime :datetime="data?.date ?? Date()" locale="ru-RU" />
     </UPage>
   </UContainer>
 </template>
