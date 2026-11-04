@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { Collections } from "@nuxt/content";
+import { useFileDialog } from "@vueuse/core";
 
 const titles: Record<keyof Collections, string> = {
   plus: "А+",
   a: "А",
   b: "B",
+  archive: "Архивный",
 };
 
 // определяем получение параметра роута через пропс и валидируем его
@@ -29,11 +31,47 @@ useHeadSafe({ title: graid.value });
 
 // получаем список карточек из коллекции
 const { data } = await useAsyncData(() => queryCollection(collection).all());
+
+const { open, reset, onCancel, onChange } = useFileDialog({
+  accept: ".md,.png",
+});
+
+onChange((files) => {
+  if (!files || files.length !== 2) return;
+
+  const formData = new FormData();
+  Array.from(files).forEach((file) => {
+    if (file.size > 1024 * 1024 || !file.size) return;
+    formData.append("files[]", file);
+  });
+
+  fetch(`/api/${collection}`, {
+    method: "POST",
+    body: formData,
+  })
+    .then((res) => {
+      if (res.ok) {
+        reset();
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      reset();
+    });
+});
+
+onCancel(() => {
+  reset();
+});
 </script>
 
 <template>
   <UContainer>
-    <UPageHeader :title="graid" />
+    <UPageHeader :title="graid">
+      <template #links>
+        <UButton icon="i-lucide-upload" variant="ghost" @click="open()" />
+      </template>
+    </UPageHeader>
     <UPageGrid>
       <UPageCard
         v-for="(card, index) in data"
@@ -48,7 +86,6 @@ const { data } = await useAsyncData(() => queryCollection(collection).all());
         <NuxtImg
           class="rounded-xl"
           :src="card.path + '.png'"
-          loading="lazy"
           quality="60"
           alt="image"
         />

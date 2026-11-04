@@ -4,9 +4,9 @@ description: "Председатель правления банка «Вект�
 date: 2026-11-01
 ---
 
-<img src="/plus/morozova.png" width="200" height="auto" alt="">
+# {{ $doc.title }}
 
-# Морозова Елена Викторовна
+## {{ $doc.description }}
 
 Родилась 12 марта 1985 года в Ярославле.
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PageFeatureProps } from "@nuxt/ui";
+import type { ButtonProps, PageFeatureProps } from "@nuxt/ui";
 
 // Главная страница с грейдами
 const features = ref<PageFeatureProps[]>([
@@ -22,6 +22,16 @@ const features = ref<PageFeatureProps[]>([
     to: "/grade/b",
   },
 ]);
+
+const links = ref<ButtonProps[]>([
+  {
+    label: "Архив",
+    to: "/grade/archive",
+    color: "neutral",
+    variant: "subtle",
+    trailingIcon: "i-lucide-arrow-right",
+  },
+]);
 </script>
 
 <template>
@@ -31,6 +41,7 @@ const features = ref<PageFeatureProps[]>([
       title="Топ-менеджент"
       description="Краткая биография руководителей"
       :features="features"
+      :links="links"
     />
   </UContainer>
 </template>

@@ -30,5 +30,14 @@ export default defineContentConfig({
         date: date(),
       }),
     }),
+    archive: defineCollection({
+      type: "page",
+      source: "archive/*.md",
+      schema: object({
+        title: string(),
+        description: string(),
+        date: date(),
+      }),
+    }),
   },
 });
