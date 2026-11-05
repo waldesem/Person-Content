@@ -35,7 +35,7 @@ const links = ref<ButtonProps[]>([
 </script>
 
 <template>
-  <UContainer class="my-[20vh]">
+  <UContainer class="my-[10vh]">
     <UPageSection
       icon="i-lucide-user-group"
       title="Топ-менеджент"

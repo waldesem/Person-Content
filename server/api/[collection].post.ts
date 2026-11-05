@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { writeFile } from "node:fs/promises";
-import type { Collections } from "@nuxt/content";
+import type { Grades } from "#shared/types";
 
 const contentDir = join(process.cwd(), "content");
 const publicDir = join(process.cwd(), "public");
@@ -13,7 +13,7 @@ const publicDir = join(process.cwd(), "public");
  * Если файл уже существует — заменяет его.
  */
 export default defineEventHandler(async (event) => {
-  const collection = getRouterParam(event, "collection") as keyof Collections;
+  const collection = getRouterParam(event, "collection") as keyof typeof Grades;
 
   const parts = await readMultipartFormData(event);
 

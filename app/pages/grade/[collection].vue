@@ -1,20 +1,17 @@
 <script setup lang="ts">
-import type { Collections } from "@nuxt/content";
+import ky from "ky";
 import { useFileDialog } from "@vueuse/core";
+import type { Collections } from "@nuxt/content";
+import { Grades } from "#shared/types";
 
-const titles: Record<keyof Collections, string> = {
-  plus: "А+",
-  a: "А",
-  b: "B",
-  archive: "Архивный",
-};
+const toast = useToast();
 
 // определяем получение параметра роута через пропс и валидируем его
 definePageMeta({
   props: true,
   validate: (route) => {
     const collParam = route.params.collection as string;
-    return collParam in titles;
+    return collParam in Grades;
   },
 });
 
@@ -22,9 +19,7 @@ definePageMeta({
 const { collection } = defineProps<{ collection: keyof Collections }>();
 
 // формируем имя грейда
-const graid = computed(() => {
-  return "Грейд " + titles[collection];
-});
+const graid = computed(() => Grades[collection]);
 
 // заголовок страницы
 useHeadSafe({ title: graid.value });
@@ -32,36 +27,49 @@ useHeadSafe({ title: graid.value });
 // получаем список карточек из коллекции
 const { data } = await useAsyncData(() => queryCollection(collection).all());
 
-const { open, reset, onCancel, onChange } = useFileDialog({
+const { open, onChange } = useFileDialog({
   accept: ".md,.png",
 });
 
-onChange((files) => {
-  if (!files || files.length !== 2) return;
+onChange(async (files) => {
+  if (!files || files.length !== 2) {
+    toast.add({
+      title: "Ошибка",
+      color: "error",
+      description: "Выберите файл md и png  для загрузки",
+    });
+    return;
+  }
 
   const formData = new FormData();
   Array.from(files).forEach((file) => {
-    if (file.size > 1024 * 1024 || !file.size) return;
+    if (file.size > 1024 * 1024 || !file.size) {
+      toast.add({
+        title: "Ошибка",
+        color: "error",
+        description: "Файлы должны быть не более 1 Мб",
+      });
+      return;
+    }
     formData.append("files[]", file);
   });
 
-  fetch(`/api/${collection}`, {
-    method: "POST",
+  const resp = await ky.post(`/api/${collection}`, {
     body: formData,
-  })
-    .then((res) => {
-      if (res.ok) {
-        reset();
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      reset();
+  });
+  if (resp.ok) {
+    toast.add({
+      title: "Успех",
+      color: "success",
+      description: "Файлы успешно загружены",
     });
-});
-
-onCancel(() => {
-  reset();
+  } else {
+    toast.add({
+      title: "Ошибка",
+      color: "error",
+      description: resp.statusText,
+    });
+  }
 });
 </script>
 
@@ -69,7 +77,12 @@ onCancel(() => {
   <UContainer>
     <UPageHeader :title="graid">
       <template #links>
-        <UButton icon="i-lucide-upload" variant="ghost" @click="open()" />
+        <UButton
+          icon="i-lucide-upload"
+          variant="ghost"
+          color="neutral"
+          @click="open()"
+        />
       </template>
     </UPageHeader>
     <UPageGrid>

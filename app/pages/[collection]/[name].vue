@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import ky from "ky";
 import type { Collections } from "@nuxt/content";
 import type { SelectItem } from "@nuxt/ui";
+import type { Grades } from "#shared/types";
 
 const router = useRouter();
 
@@ -35,55 +37,58 @@ if (!data.value) {
 
 useHeadSafe({ title: data.value?.title || "Страница не найдена" });
 
-const items = ref<SelectItem[]>([
+type SelectGrade = SelectItem & {
+  label: (typeof Grades)[keyof typeof Grades];
+  value: keyof typeof Grades;
+};
+
+const items = ref<SelectGrade[]>([
   {
-    label: "A+",
+    label: "Грейд A+",
     value: "plus",
   },
   {
-    label: "A",
+    label: "Грейд A",
     value: "a",
   },
   {
-    label: "B",
+    label: "Грейд B",
     value: "b",
   },
   {
-    label: "Archive",
+    label: "Архивный",
     value: "archive",
   },
 ]);
 
 const item = ref(collection);
 
-function rename() {
-  if (item.value === collection) return;
-  if (!confirm("Вы дейтсвительно хотите изменить грейд?")) return;
+async function replaceDest() {
+  if (item.value === collection) {
+    return;
+  }
+  if (!confirm("Вы действительно хотите изменить грейд?")) {
+    item.value = collection;
+    return;
+  }
 
-  fetch(`/api/${collection}/${name}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      item: item.value,
-    }),
-  })
-    .then((res) => {
-      if (res.ok) {
-        router.push("/grade/" + item.value);
-        toast.add({
-          title: "Успех",
-          description: "Страница перенесена в другую категорию",
-        });
-      }
-    })
-    .catch((err) => {
-      toast.add({
-        title: "Ошибка",
-        description: err.message,
-      });
+  const resp = await ky.post(`/api/${collection}/${name}`, {
+    json: { item: item.value },
+  });
+  if (resp.ok) {
+    router.push("/grade/" + item.value);
+    toast.add({
+      title: "Успех",
+      color: "success",
+      description: "Страница перенесена в другую категорию",
     });
+  } else {
+    toast.add({
+      title: "Ошибка",
+      color: "error",
+      description: resp.statusText,
+    });
+  }
 }
 </script>
 
@@ -100,10 +105,10 @@ function rename() {
         <USelect
           v-model="item"
           :items="items"
-          class="absolute top-0 right-10 w-auto"
+          class="absolute top-3 right-10 w-auto"
           placeholder="Перенести в категорию"
           variant="soft"
-          @change="rename"
+          @change="replaceDest"
         />
       </div>
       <ContentRenderer class="pt-2" :value="data" />
