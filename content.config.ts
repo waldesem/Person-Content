@@ -1,43 +1,26 @@
 import { defineContentConfig, defineCollection } from "@nuxt/content";
-import { object, string, date } from "valibot";
 
 export default defineContentConfig({
   collections: {
     a: defineCollection({
       type: "page",
       source: "a/*.md",
-      schema: object({
-        title: string(),
-        description: string(),
-        date: date(),
-      }),
+      schema: CollSchema,
     }),
     b: defineCollection({
       type: "page",
       source: "b/*.md",
-      schema: object({
-        title: string(),
-        description: string(),
-        date: date(),
-      }),
+      schema: CollSchema,
     }),
     plus: defineCollection({
       type: "page",
       source: "plus/*.md",
-      schema: object({
-        title: string(),
-        description: string(),
-        date: date(),
-      }),
+      schema: CollSchema,
     }),
     archive: defineCollection({
       type: "page",
       source: "archive/*.md",
-      schema: object({
-        title: string(),
-        description: string(),
-        date: date(),
-      }),
+      schema: CollSchema,
     }),
   },
 });

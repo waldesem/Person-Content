@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import ky from "ky";
-import type { Collections } from "@nuxt/content";
-import type { SelectItem } from "@nuxt/ui";
-import type { Grades } from "#shared/types";
+import type { Grades, SelectGrade } from "#shared/types";
 
 const router = useRouter();
 
@@ -13,7 +11,7 @@ definePageMeta({ props: true });
 
 // получаем параметры роута черех пропсы
 const { collection, name } = defineProps<{
-  collection: keyof Collections;
+  collection: keyof typeof Grades;
   name: string;
 }>();
 
@@ -36,11 +34,6 @@ if (!data.value) {
 }
 
 useHeadSafe({ title: data.value?.title || "Страница не найдена" });
-
-type SelectGrade = SelectItem & {
-  label: (typeof Grades)[keyof typeof Grades];
-  value: keyof typeof Grades;
-};
 
 const items = ref<SelectGrade[]>([
   {

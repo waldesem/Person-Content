@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import ky from "ky";
 import { useFileDialog } from "@vueuse/core";
-import type { Collections } from "@nuxt/content";
-import { Grades } from "#shared/types";
+import { CollGrades, type CollSchema } from "#shared/types";
 
 const toast = useToast();
 
@@ -11,21 +10,31 @@ definePageMeta({
   props: true,
   validate: (route) => {
     const collParam = route.params.collection as string;
-    return collParam in Grades;
+    return collParam in CollGrades;
   },
 });
 
 // получаем параметры роута черех пропсы
-const { collection } = defineProps<{ collection: keyof Collections }>();
+const { collection } = defineProps<{ collection: keyof typeof CollGrades }>();
 
 // формируем имя грейда
-const graid = computed(() => Grades[collection]);
+const graid = computed(() => CollGrades[collection]);
+
+const orderBy = ref({
+  field: "date" as keyof typeof CollSchema,
+  direction: "ASC" as "ASC" | "DESC",
+});
 
 // заголовок страницы
 useHeadSafe({ title: graid.value });
 
 // получаем список карточек из коллекции
-const { data } = await useAsyncData(() => queryCollection(collection).all());
+const { data, execute } = await useAsyncData(() =>
+  queryCollectionNavigation(collection).order(
+    orderBy.value.field,
+    orderBy.value.direction,
+  ),
+);
 
 const { open, onChange } = useFileDialog({
   accept: ".md,.png",
@@ -77,12 +86,28 @@ onChange(async (files) => {
   <UContainer>
     <UPageHeader :title="graid">
       <template #links>
-        <UButton
-          icon="i-lucide-upload"
-          variant="ghost"
-          color="neutral"
-          @click="open()"
-        />
+        <div class="inline-flex items-center space-x-1">
+          <USelect
+            v-model="orderBy.field"
+            class="w-auto"
+            :items="[{ date: 'По дате' }, { title: 'По имени' }]"
+            variant="soft"
+            @change="execute()"
+          />
+          <USelect
+            v-model="orderBy.direction"
+            class="w-auto"
+            :items="[{ ASC: 'По убыванию' }, { DESC: 'По возрастанию' }]"
+            variant="soft"
+            @change="execute()"
+          />
+          <UButton
+            icon="i-lucide-upload"
+            variant="ghost"
+            color="neutral"
+            @click="open()"
+          />
+        </div>
       </template>
     </UPageHeader>
     <UPageGrid>
@@ -90,7 +115,7 @@ onChange(async (files) => {
         v-for="(card, index) in data"
         :key="index"
         :title="card.title"
-        :description="card.description"
+        :description="card.description as string"
         :to="card.path"
         orientation="horizontal"
         target="_blank"
