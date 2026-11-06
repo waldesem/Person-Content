@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ky from "ky";
 import { useFileDialog } from "@vueuse/core";
-import { CollGrades, type CollSchema } from "#shared/types";
+import { CollGrades } from "#shared/types";
 
 const toast = useToast();
 
@@ -20,20 +20,15 @@ const { collection } = defineProps<{ collection: keyof typeof CollGrades }>();
 // формируем имя грейда
 const graid = computed(() => CollGrades[collection]);
 
-const orderBy = ref({
-  field: "date" as keyof typeof CollSchema,
-  direction: "ASC" as "ASC" | "DESC",
-});
+const field = shallowRef("date" as "date" | "title");
+const direction = shallowRef("ASC" as "ASC" | "DESC");
 
 // заголовок страницы
 useHeadSafe({ title: graid.value });
 
-// получаем список карточек из коллекции
-const { data, execute } = await useAsyncData(() =>
-  queryCollectionNavigation(collection).order(
-    orderBy.value.field,
-    orderBy.value.direction,
-  ),
+// получаем список навигации из коллекции
+const { data, refresh } = await useAsyncData(() =>
+  queryCollectionNavigation(collection).order(field.value, direction.value),
 );
 
 const { open, onChange } = useFileDialog({
@@ -87,26 +82,35 @@ onChange(async (files) => {
     <UPageHeader :title="graid">
       <template #links>
         <div class="inline-flex items-center space-x-1">
-          <USelect
-            v-model="orderBy.field"
-            class="w-auto"
-            :items="[{ date: 'По дате' }, { title: 'По имени' }]"
-            variant="soft"
-            @change="execute()"
-          />
-          <USelect
-            v-model="orderBy.direction"
-            class="w-auto"
-            :items="[{ ASC: 'По убыванию' }, { DESC: 'По возрастанию' }]"
-            variant="soft"
-            @change="execute()"
-          />
-          <UButton
-            icon="i-lucide-upload"
-            variant="ghost"
-            color="neutral"
-            @click="open()"
-          />
+          <UTooltip text="Упорядочить">
+            <USelect
+              v-model="field"
+              class="w-auto"
+              size="sm"
+              :items="[{ date: 'По дате' }, { title: 'По имени' }]"
+              variant="soft"
+              @change="refresh()"
+            />
+          </UTooltip>
+          <UTooltip text="Сортировать">
+            <USelect
+              v-model="direction"
+              class="w-auto"
+              size="sm"
+              :items="[{ ASC: 'По убыванию' }, { DESC: 'По возрастанию' }]"
+              variant="soft"
+              @change="refresh()"
+            />
+          </UTooltip>
+          <UTooltip text="Выбрать файлы .md и .png">
+            <UButton
+              icon="i-lucide-upload"
+              size="sm"
+              variant="ghost"
+              color="neutral"
+              @click="open()"
+            />
+          </UTooltip>
         </div>
       </template>
     </UPageHeader>

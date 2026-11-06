@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ky from "ky";
-import type { Grades, SelectGrade } from "#shared/types";
+import type { CollGrades, SelectGrade } from "#shared/types";
 
 const router = useRouter();
 
@@ -11,7 +11,7 @@ definePageMeta({ props: true });
 
 // получаем параметры роута черех пропсы
 const { collection, name } = defineProps<{
-  collection: keyof typeof Grades;
+  collection: keyof typeof CollGrades;
   name: string;
 }>();
 
@@ -22,10 +22,6 @@ const { data } = await useAsyncData(`${collection}-${name}`, () =>
 
 // проверяем, существует ли страница
 if (!data.value) {
-  toast.add({
-    title: "Ошибка",
-    description: "Страница не найдена",
-  });
   throw createError({
     statusCode: 404,
     statusMessage: "Страница не найдена",
@@ -54,7 +50,7 @@ const items = ref<SelectGrade[]>([
   },
 ]);
 
-const item = ref(collection);
+const item = shallowRef(collection);
 
 async function replaceDest() {
   if (item.value === collection) {
