@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import ky from "ky";
 import { useFileDialog } from "@vueuse/core";
-import { CollGrades } from "#shared/types";
+
+const router = useRouter();
 
 const toast = useToast();
 
@@ -32,73 +33,43 @@ const { data, refresh } = await useAsyncData(() =>
 );
 
 const { open, onChange } = useFileDialog({
-  accept: ".md,.png",
+  accept: ".md",
+  multiple: false,
 });
 
 onChange(async (files) => {
-  if (!files || files.length !== 2) {
+  if (!files || !files[0]) return;
+
+  if (files[0].size > 1024 * 1024 || !files[0]?.name.endsWith(".md")) {
     toast.add({
       title: "Ошибка",
       color: "error",
-      description: "Выберите два файла",
+      description: "Выберите файл md не более 1 Mb",
     });
     return;
   }
 
-  if (
-    files[0] &&
-    files[0]?.size > 1024 * 1024 &&
-    files[1] &&
-    files[1]?.size > 1024 * 1024
-  ) {
+  const name = files[0]?.name.replace(/\.md$/, "");
+
+  if (!name || !/^[a-z]+$/.test(name)) {
     toast.add({
       title: "Ошибка",
       color: "error",
-      description: "Выберите файлы не более 1 Mb каждый",
-    });
-    return;
-  }
-
-  if (!files[0]?.name.endsWith(".md") && !files[1]?.name.endsWith(".png")) {
-    toast.add({
-      title: "Ошибка",
-      color: "error",
-      description: "Выберите файлы md и png",
-    });
-    return;
-  }
-
-  const name1 = files[0]?.name.replace(/\.md$/, "").replace(/\.png$/, "");
-  const name2 = files[1]?.name.replace(/\.md$/, "").replace(/\.png$/, "");
-
-  if (!name1 || !name2) {
-    toast.add({
-      title: "Ошибка",
-      color: "error",
-      description: "Имя файла не должно совпадать с его расширением",
-    });
-    return;
-  }
-
-  if ((name1 !== name2 && !/^[a-z]+$/.test(name1)) || !/^[a-z]+$/.test(name2)) {
-    toast.add({
-      title: "Ошибка",
-      color: "error",
-      description: "Выберите c одинаковым именем из латинских букв",
+      description:
+        "Имя файла не должно совпадать с его расширением и должно состоять из латинских букв",
     });
     return;
   }
 
   const formData = new FormData();
-  Array.from(files).forEach((file) => {
-    formData.append("files[]", file);
-  });
+  formData.append("file", files[0]);
 
   const resp = await ky.post(`/api/${collection}`, {
     body: formData,
   });
 
   if (resp.ok) {
+    router.push(`/${collection}/${name}`);
     toast.add({
       title: "Успех",
       color: "success",
@@ -118,43 +89,41 @@ onChange(async (files) => {
   <UContainer>
     <UPageHeader :title="graid">
       <template #links>
-        <div class="inline-flex items-center space-x-1">
-          <UTooltip text="Упорядочить">
-            <USelect
-              v-model="field"
-              class="w-auto"
-              size="sm"
-              :items="[
-                { value: 'date', label: 'По дате' },
-                { value: 'title', label: 'По имени' },
-              ]"
-              variant="ghost"
-              @change="refresh()"
-            />
-          </UTooltip>
-          <UTooltip text="Сортировать">
-            <USelect
-              v-model="direction"
-              class="w-auto"
-              size="sm"
-              :items="[
-                { value: 'ASC', label: 'По убыванию' },
-                { value: 'DESC', label: 'По возрастанию' },
-              ]"
-              variant="ghost"
-              @change="refresh()"
-            />
-          </UTooltip>
-          <UTooltip text="Выбрать файлы .md и .png">
-            <UButton
-              icon="i-lucide-upload"
-              size="sm"
-              variant="ghost"
-              color="neutral"
-              @click="open()"
-            />
-          </UTooltip>
-        </div>
+        <UTooltip text="Упорядочить">
+          <USelect
+            v-model="field"
+            class="w-auto"
+            size="sm"
+            :items="[
+              { value: 'date', label: 'По дате' },
+              { value: 'title', label: 'По имени' },
+            ]"
+            variant="soft"
+            @change="refresh()"
+          />
+        </UTooltip>
+        <UTooltip text="Сортировать">
+          <USelect
+            v-model="direction"
+            class="w-auto"
+            size="sm"
+            :items="[
+              { value: 'ASC', label: 'По убыванию' },
+              { value: 'DESC', label: 'По возрастанию' },
+            ]"
+            variant="soft"
+            @change="refresh()"
+          />
+        </UTooltip>
+        <UTooltip text="Выбрать файл .md">
+          <UButton
+            label="Загрузить"
+            size="sm"
+            variant="soft"
+            color="neutral"
+            @click="open()"
+          />
+        </UTooltip>
       </template>
     </UPageHeader>
     <UPageGrid>
@@ -172,7 +141,7 @@ onChange(async (files) => {
           class="rounded-xl"
           :src="card.path + '.png'"
           quality="60"
-          alt="image"
+          alt="Нет фото"
         />
       </UPageCard>
     </UPageGrid>

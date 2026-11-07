@@ -6,7 +6,7 @@ const contentDir = join(process.cwd(), "content");
 const publicDir = join(process.cwd(), "public");
 
 /**
- * PUT /api/:collection/<filename>
+ * POST /api/:collection/<filename>
  * Получает в теле имя новой коллекции и переносит файлы .md и .png в новую коллекцию
  */
 export default defineEventHandler(async (event) => {

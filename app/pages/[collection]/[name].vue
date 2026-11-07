@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ky from "ky";
-import type { CollGrades, SelectGrade } from "#shared/types";
+import { useFileDialog } from "@vueuse/core";
 
 const router = useRouter();
 
@@ -16,7 +16,7 @@ const { collection, name } = defineProps<{
 }>();
 
 // получаем данные из коллекции
-const { data } = await useAsyncData(`${collection}-${name}`, () =>
+const { data, refresh } = await useAsyncData(`${collection}-${name}`, () =>
   queryCollection(collection).path(`/${collection}/${name}`).first(),
 );
 
@@ -52,7 +52,7 @@ const items = ref<SelectGrade[]>([
 
 const item = shallowRef(collection);
 
-async function replaceDest() {
+async function remove() {
   if (item.value === collection) {
     return;
   }
@@ -79,28 +79,78 @@ async function replaceDest() {
     });
   }
 }
+
+const { open, onChange } = useFileDialog({
+  accept: ".png",
+  multiple: false,
+});
+
+onChange(async (files) => {
+  if (!files || !files[0]) return;
+
+  if (files[0].size > 1024 * 1024 || !files[0]?.name.endsWith(".png")) {
+    toast.add({
+      title: "Ошибка",
+      color: "error",
+      description: "Выберите файл png не более 1 Mb",
+    });
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", files[0], `${name}.png`);
+
+  const resp = await ky.post(`/api/${collection}`, {
+    body: formData,
+  });
+
+  if (resp.ok) {
+    await refresh();
+    toast.add({
+      title: "Успех",
+      color: "success",
+      description: "Файлы успешно загружены",
+    });
+  } else {
+    toast.add({
+      title: "Ошибка",
+      color: "error",
+      description: resp.statusText,
+    });
+  }
+});
 </script>
 
 <template>
   <UContainer>
-    <UPage v-if="data" class="py-8">
+    <UPage v-if="data" class="pt-8">
       <NuxtImg
         class="rounded-xl"
         :src="`/${collection}/${name}.png`"
-        width="360"
+        width="320"
         height="auto"
-        alt="image"
+        alt="Нет фото"
       />
       <UPageHeader :title="data?.title" :description="data?.description">
         <template #links>
-          <USelect
-            v-model="item"
-            :items="items"
-            class="w-auto"
-            placeholder="Перенести в категорию"
-            variant="soft"
-            @change="replaceDest"
-          />
+          <UTooltip text="Перенести в категорию">
+            <USelect
+              v-model="item"
+              :items="items"
+              class="w-auto"
+              variant="soft"
+              @change="remove"
+            />
+          </UTooltip>
+          <UTooltip text="Выбрать файл .png">
+            <UButton
+              label="Загрузить"
+              size="sm"
+              variant="soft"
+              color="neutral"
+              @click="open()"
+            />
+          </UTooltip>
         </template>
       </UPageHeader>
       <ContentRenderer :value="data" />
