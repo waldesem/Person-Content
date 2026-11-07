@@ -9,17 +9,19 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxt/cli": "4.0.3",
     "@nuxt/content": "3.16.2",
     "@nuxt/image": "^2.2.1",
     "@nuxt/ui": "^4.12.0",
     "@vueuse/core": "^15.0.0",
     "better-sqlite3": "^13.0.3",
     "ky": "^2.2.0",
-    "nuxt": "^4.6.3",
-    "tailwindcss": "^4.3.3"
+    "nuxt": "^4.6.4",
+    "tailwindcss": "^4.3.5",
+    "valibot": "^1.5.0"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.150",
+    "@iconify-json/lucide": "^1.2.151",
     "@nuxt/eslint": "^1.17.0",
     "@nuxt/eslint-config": "^1.17.0",
     "@types/node": "^26.6.6",

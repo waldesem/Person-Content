@@ -28,7 +28,7 @@ useHeadSafe({ title: graid.value });
 
 // получаем список навигации из коллекции
 const { data, refresh } = await useAsyncData(() =>
-  queryCollectionNavigation(collection).order(field.value, direction.value),
+  queryCollection(collection).order(field.value, direction.value).all(),
 );
 
 const { open, onChange } = useFileDialog({
@@ -40,27 +40,64 @@ onChange(async (files) => {
     toast.add({
       title: "Ошибка",
       color: "error",
-      description: "Выберите файл md и png  для загрузки",
+      description: "Выберите два файла",
+    });
+    return;
+  }
+
+  if (
+    files[0] &&
+    files[0]?.size > 1024 * 1024 &&
+    files[1] &&
+    files[1]?.size > 1024 * 1024
+  ) {
+    toast.add({
+      title: "Ошибка",
+      color: "error",
+      description: "Выберите файлы не более 1 Mb каждый",
+    });
+    return;
+  }
+
+  if (!files[0]?.name.endsWith(".md") && !files[1]?.name.endsWith(".png")) {
+    toast.add({
+      title: "Ошибка",
+      color: "error",
+      description: "Выберите файлы md и png",
+    });
+    return;
+  }
+
+  const name1 = files[0]?.name.replace(/\.md$/, "").replace(/\.png$/, "");
+  const name2 = files[1]?.name.replace(/\.md$/, "").replace(/\.png$/, "");
+
+  if (!name1 || !name2) {
+    toast.add({
+      title: "Ошибка",
+      color: "error",
+      description: "Имя файла не должно совпадать с его расширением",
+    });
+    return;
+  }
+
+  if ((name1 !== name2 && !/^[a-z]+$/.test(name1)) || !/^[a-z]+$/.test(name2)) {
+    toast.add({
+      title: "Ошибка",
+      color: "error",
+      description: "Выберите c одинаковым именем из латинских букв",
     });
     return;
   }
 
   const formData = new FormData();
   Array.from(files).forEach((file) => {
-    if (file.size > 1024 * 1024 || !file.size) {
-      toast.add({
-        title: "Ошибка",
-        color: "error",
-        description: "Файлы должны быть не более 1 Мб",
-      });
-      return;
-    }
     formData.append("files[]", file);
   });
 
   const resp = await ky.post(`/api/${collection}`, {
     body: formData,
   });
+
   if (resp.ok) {
     toast.add({
       title: "Успех",
@@ -87,8 +124,11 @@ onChange(async (files) => {
               v-model="field"
               class="w-auto"
               size="sm"
-              :items="[{ date: 'По дате' }, { title: 'По имени' }]"
-              variant="soft"
+              :items="[
+                { value: 'date', label: 'По дате' },
+                { value: 'title', label: 'По имени' },
+              ]"
+              variant="ghost"
               @change="refresh()"
             />
           </UTooltip>
@@ -97,8 +137,11 @@ onChange(async (files) => {
               v-model="direction"
               class="w-auto"
               size="sm"
-              :items="[{ ASC: 'По убыванию' }, { DESC: 'По возрастанию' }]"
-              variant="soft"
+              :items="[
+                { value: 'ASC', label: 'По убыванию' },
+                { value: 'DESC', label: 'По возрастанию' },
+              ]"
+              variant="ghost"
               @change="refresh()"
             />
           </UTooltip>
@@ -119,7 +162,7 @@ onChange(async (files) => {
         v-for="(card, index) in data"
         :key="index"
         :title="card.title"
-        :description="card.description as string"
+        :description="card.description"
         :to="card.path"
         orientation="horizontal"
         target="_blank"

@@ -84,23 +84,26 @@ async function replaceDest() {
 <template>
   <UContainer>
     <UPage v-if="data" class="py-8">
-      <img
+      <NuxtImg
+        class="rounded-xl"
         :src="`/${collection}/${name}.png`"
         width="360"
         height="auto"
-        alt=""
+        alt="image"
       />
-      <div class="relative">
-        <USelect
-          v-model="item"
-          :items="items"
-          class="absolute top-3 right-10 w-auto"
-          placeholder="Перенести в категорию"
-          variant="soft"
-          @change="replaceDest"
-        />
-      </div>
-      <ContentRenderer class="pt-2" :value="data" />
+      <UPageHeader :title="data?.title" :description="data?.description">
+        <template #links>
+          <USelect
+            v-model="item"
+            :items="items"
+            class="w-auto"
+            placeholder="Перенести в категорию"
+            variant="soft"
+            @change="replaceDest"
+          />
+        </template>
+      </UPageHeader>
+      <ContentRenderer :value="data" />
       <template #right>
         <UContentToc title="Содержание" :links="data.body.toc?.links" />
       </template>
