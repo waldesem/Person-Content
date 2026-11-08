@@ -1,11 +1,4 @@
 <script setup lang="ts">
-import ky from "ky";
-import { useFileDialog } from "@vueuse/core";
-
-const router = useRouter();
-
-const toast = useToast();
-
 // определяем получение параметра роута через пропс и валидируем его
 definePageMeta({
   props: true,
@@ -31,58 +24,6 @@ useHeadSafe({ title: graid.value });
 const { data, refresh } = await useAsyncData(() =>
   queryCollection(collection).order(field.value, direction.value).all(),
 );
-
-const { open, onChange } = useFileDialog({
-  accept: ".md",
-  multiple: false,
-});
-
-onChange(async (files) => {
-  if (!files || !files[0]) return;
-
-  if (files[0].size > 1024 * 1024 || !files[0]?.name.endsWith(".md")) {
-    toast.add({
-      title: "Ошибка",
-      color: "error",
-      description: "Выберите файл md не более 1 Mb",
-    });
-    return;
-  }
-
-  const name = files[0]?.name.replace(/\.md$/, "");
-
-  if (!name || !/^[a-z]+$/.test(name)) {
-    toast.add({
-      title: "Ошибка",
-      color: "error",
-      description:
-        "Имя файла не должно совпадать с его расширением и должно состоять из латинских букв",
-    });
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("file", files[0]);
-
-  const resp = await ky.post(`/api/${collection}`, {
-    body: formData,
-  });
-
-  if (resp.ok) {
-    router.push(`/${collection}/${name}`);
-    toast.add({
-      title: "Успех",
-      color: "success",
-      description: "Файлы успешно загружены",
-    });
-  } else {
-    toast.add({
-      title: "Ошибка",
-      color: "error",
-      description: resp.statusText,
-    });
-  }
-});
 </script>
 
 <template>
@@ -113,15 +54,6 @@ onChange(async (files) => {
             ]"
             variant="soft"
             @change="refresh()"
-          />
-        </UTooltip>
-        <UTooltip text="Выбрать файл .md">
-          <UButton
-            label="Загрузить"
-            size="sm"
-            variant="soft"
-            color="neutral"
-            @click="open()"
           />
         </UTooltip>
       </template>

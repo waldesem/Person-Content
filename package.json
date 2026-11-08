@@ -13,10 +13,7 @@
     "@nuxt/content": "3.16.2",
     "@nuxt/image": "^2.2.1",
     "@nuxt/ui": "^4.12.0",
-    "@vueuse/core": "^15.0.0",
     "better-sqlite3": "^13.0.3",
-    "jimp": "^1.6.1",
-    "ky": "^2.2.0",
     "nuxt": "^4.6.4",
     "tailwindcss": "^4.3.5",
     "valibot": "^1.5.0"
