@@ -8,7 +8,6 @@ export default defineContentConfig({
       source: "a/*.md",
       schema: object({
         title: string(),
-        birthday: date(),
         description: string(),
         date: date(),
       }),
@@ -18,7 +17,6 @@ export default defineContentConfig({
       source: "b/*.md",
       schema: object({
         title: string(),
-        birthday: date(),
         description: string(),
         date: date(),
       }),
@@ -28,7 +26,6 @@ export default defineContentConfig({
       source: "plus/*.md",
       schema: object({
         title: string(),
-        birthday: date(),
         description: string(),
         date: date(),
       }),
@@ -38,7 +35,6 @@ export default defineContentConfig({
       source: "archive/*.md",
       schema: object({
         title: string(),
-        birthday: date(),
         description: string(),
         date: date(),
       }),

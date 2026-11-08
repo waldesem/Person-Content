@@ -6,11 +6,14 @@ Rаждый грейд — отдельная коллекция Markdown-фай
 
 ## Стек
 
-- [Nuxt 4](https://nuxt.com) — фреймворк (SSR + prerender главной страницы)
+- [Nuxt 4](https://nuxt.com) — Vue-based SSR-фреймворк
 - [@nuxt/content 3](https://content.nuxt.com) — контент на Markdown с SQLite-базой
-- [@nuxt/ui 4](https://ui.nuxt.com) — компоненты
+- [@nuxt/ui 4](https://ui.nuxt.com) — UI-компоненты
+- [VueUse](https://vueuse.org) - набор утилит
 - [Tailwind CSS 4](https://tailwindcss.com) — стилизация
-- [Valibot](https://valibot.dev) - схемы коллекций
+- [Valibot](https://valibot.dev) - схема коллекций
+- [Jimp](https://jimp-dev.github.io/jimp) - преобразование изображений
+- [Ky](https://github.com/sindresorhus/ky) - HTTP-клиент
 - [Bun](https://bun.sh) — пакетный менеджер и рантайм
 
 ## Структура проекта
@@ -26,11 +29,18 @@ Rаждый грейд — отдельная коллекция Markdown-фай
 │       └── [collection]/[name].vue # Страница биографии конкретной персоны
 ├── content/
 │   └── plus/                       # Коллекция «plus»: биографии грейда А+
-│       └── 1.morozova.md
+│       └── morozova.md
 ├── public/
 │   └── plus/                       # Фотографии персон (public/<collection>/<name>.png)
 ├── content.config.ts               # Определение коллекций контента (a, b, plus)
-└── nuxt.config.ts                  # Конфигурация Nuxt
+├── nuxt.config.ts                  # Конфигурация Nuxt
+├── server/
+│   └── api                         # Nitro-сервер
+│       ├── [collection].post.ts    # добавление нового файла md в коллекцию
+│       └── [collection]/
+│            ├── [name].post.ts     # перемещение в другую коллекцию
+│            └── [name].patch.ts    # добавление/перезапись изображения или md
+└── shared/types/index.ts           # типы данных
 ```
 
 ## Коллекции контента
@@ -54,10 +64,6 @@ description: "Должность, короткое описание"
 date: 2026-11-01
 ---
 
-<img src="/plus/<name>.png" width="200" height="auto" alt="">
-
-# Фамилия Имя Отчество
-
 ## Образование
 
 - ...
@@ -67,7 +73,7 @@ date: 2026-11-01
 - ...
 ```
 
-Фотография персоны кладётся в `public/<collection>/<name>.png` и автоматически подставляется в карточку на странице грейда.
+Фотография персоны добавляется в `public/<collection>/<name>.png` и автоматически подставляется в карточку.
 
 ## Запуск
 
@@ -95,15 +101,11 @@ node .output/server/index.mjs
 # Listening on http://localhost:3000
 ```
 
-Предпросмотр собранной версии: `bun run preview`.
-
-Главная страница (`/`) пререндерится при сборке (см. `routeRules` в [`nuxt.config.ts`](nuxt.config.ts)).
-
 ## Добавление новой персоны
 
-1. Создайте файл `content/<collection>/<номер>.<name>.md` с frontmatter (`title`, `description`, `date`) и текстом биографии.
-2. Добавьте фотографию `public/<collection>/<name>.png`.
-3. Персона автоматически появится в списке соответствующего грейда.
+- На одной из страниц `grade` загрузите файл `<name>.md` с (`title`, `description`, `date`) и текстом биографии.
+- Персона автоматически появится в списке соответствующего грейда.
+- На странице `grade/<name>.md` добавьте фотографию.
 
 ## Разработка
 

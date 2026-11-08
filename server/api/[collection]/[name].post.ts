@@ -1,6 +1,5 @@
 import { join } from "node:path";
 import fs from "node:fs/promises";
-import type { CollGrades } from "#shared/types";
 
 const contentDir = join(process.cwd(), "content");
 const publicDir = join(process.cwd(), "public");
@@ -31,4 +30,7 @@ export default defineEventHandler(async (event) => {
       message: String(error),
     });
   }
+  return {
+    ok: true,
+  };
 });

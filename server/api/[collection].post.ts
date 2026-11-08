@@ -1,15 +1,13 @@
 import { join } from "node:path";
 import { writeFile } from "node:fs/promises";
-import type { CollGrades } from "#shared/types";
 
 const contentDir = join(process.cwd(), "content");
-const publicDir = join(process.cwd(), "public");
 
 /**
  * POST /api/:collection
- * Принимает файлы (.md или .png) в multipart/form-data.
- * Сохраняет md в content/:collection/<filename>.md, а png в public/:collection/<filename>.png.
- * Если файл уже существует — заменяет его.
+ * Принимает файл .md в multipart/form-data.
+ * Сохраняет в content/:collection/<filename>.md
+ * Если файл уже существует — возвращает ошибку.
  */
 export default defineEventHandler(async (event) => {
   const collection = getRouterParam(
@@ -19,32 +17,32 @@ export default defineEventHandler(async (event) => {
 
   const parts = await readMultipartFormData(event);
 
-  // Проверяем, что в запросе есть файлы .md и .png
+  // Проверяем, что в запросе есть файлы
   if (!parts) {
     throw createError({
       status: 400,
-      message: "Ожидается multiparqt/form-data с файлом .md или .png",
+      message: "Ожидается multiparqt/form-data",
     });
   }
 
-  // Находим файлы .md и .png
   const file = parts.find((p) => p.filename?.endsWith(".md"));
-  const image = parts.find((p) => p.filename?.endsWith(".png"));
-
-  try {
-    if (file?.filename) {
+  if (file && file.filename) {
+    try {
       const filePath = join(contentDir, collection, file.filename);
       await writeFile(filePath, file.data.toString("utf-8"), {
         encoding: "utf-8",
+        flag: "wx",
       });
-    } else if (image?.filename) {
-      const imagePath = join(publicDir, collection, image.filename);
-      await writeFile(imagePath, image.data);
+    } catch (error) {
+      throw createError({
+        status: 500,
+        message: String(error),
+      });
     }
-  } catch (error) {
+  } else {
     throw createError({
       status: 500,
-      message: String(error),
+      message: "File name error",
     });
   }
 

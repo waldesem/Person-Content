@@ -52,7 +52,7 @@ const items = ref<SelectGrade[]>([
 
 const item = shallowRef(collection);
 
-async function remove() {
+async function replace() {
   if (item.value === collection) {
     return;
   }
@@ -81,26 +81,26 @@ async function remove() {
 }
 
 const { open, onChange } = useFileDialog({
-  accept: ".png",
+  accept: "image/*,.md",
   multiple: false,
 });
 
 onChange(async (files) => {
-  if (!files || !files[0]) return;
-
-  if (files[0].size > 1024 * 1024 || !files[0]?.name.endsWith(".png")) {
+  if (!files || !files[0] || files[0].size > 1024 * 1024) {
     toast.add({
       title: "Ошибка",
       color: "error",
-      description: "Выберите файл png не более 1 Mb",
+      description: "Выберите файл не более 1 Mb",
     });
     return;
   }
 
-  const formData = new FormData();
-  formData.append("file", files[0], `${name}.png`);
+  if (!confirm("Содержимеое будет перезаписано!")) return;
 
-  const resp = await ky.post(`/api/${collection}`, {
+  const formData = new FormData();
+  formData.append("file", files[0]);
+
+  const resp = await ky.patch(`/api/${collection}/${name}`, {
     body: formData,
   });
 
@@ -139,10 +139,10 @@ onChange(async (files) => {
               :items="items"
               class="w-auto"
               variant="soft"
-              @change="remove"
+              @change="replace"
             />
           </UTooltip>
-          <UTooltip text="Выбрать файл .png">
+          <UTooltip text="Выбрать новый файл .md">
             <UButton
               label="Загрузить"
               size="sm"
