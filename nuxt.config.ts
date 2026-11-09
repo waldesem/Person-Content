@@ -29,12 +29,12 @@ export default defineNuxtConfig({
     "/": { prerender: true },
   },
 
-  compatibilityDate: "2026-11-01",
+  compatibilityDate: "2026-11-09",
 
   content: {
     database: {
       type: "sqlite",
-      filename: "SQLITE_DB_LOCATION",
+      filename: ":memory:",
     },
   },
 });

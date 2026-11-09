@@ -17,7 +17,7 @@ const { data } = await useAsyncData(`${collection}-${name}`, () =>
 if (!data.value) {
   throw createError({
     statusCode: 404,
-    statusMessage: "Страница не найдена",
+    message: "Страница не найдена",
     fatal: true,
   });
 }
