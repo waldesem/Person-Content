@@ -1,24 +1,29 @@
+<script lang="ts">
+import type { Collections } from "@nuxt/content";
+
+const grades: { [K in keyof Collections]: string } = {
+  plus: "Грейд A+" as const,
+  a: "Грейд A" as const,
+  b: "Грейд B" as const,
+  archive: "Архивный" as const,
+};
+</script>
+
 <script setup lang="ts">
 // определяем получение параметра роута через пропс и валидируем его
 definePageMeta({
   props: true,
   validate: (route) => {
-    const collParam = route.params.collection as string;
-    return collParam in CollGrades;
+    const param = route.params.collection as string;
+    return param in grades;
   },
 });
 
 // получаем параметры роута черех пропсы
-const { collection } = defineProps<{ collection: keyof typeof CollGrades }>();
+const { collection } = defineProps<{ collection: keyof typeof grades }>();
 
-// формируем имя грейда
-const graid = computed(() => CollGrades[collection]);
-
-const field = shallowRef("date" as "date" | "title");
-const direction = shallowRef("ASC" as "ASC" | "DESC");
-
-// заголовок страницы
-useHeadSafe({ title: graid.value });
+const field = shallowRef<"date" | "title">("date");
+const direction = shallowRef<"ASC" | "DESC">("ASC");
 
 // получаем список навигации из коллекции
 const { data, refresh } = await useAsyncData(() =>
@@ -28,7 +33,7 @@ const { data, refresh } = await useAsyncData(() =>
 
 <template>
   <UContainer>
-    <UPageHeader :title="graid">
+    <UPageHeader :title="grades[collection]">
       <template #links>
         <UTooltip text="Упорядочить">
           <USelect

@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import type { Collections } from "@nuxt/content";
+
 // определяем получение параметров роута через пропсы
 definePageMeta({ props: true });
 
 // получаем параметры роута черех пропсы
 const { collection, name } = defineProps<{
-  collection: keyof typeof CollGrades;
+  collection: keyof Collections;
   name: string;
 }>();
 
@@ -21,8 +23,6 @@ if (!data.value) {
     fatal: true,
   });
 }
-
-useHeadSafe({ title: data.value?.title || "Страница не найдена" });
 </script>
 
 <template>
