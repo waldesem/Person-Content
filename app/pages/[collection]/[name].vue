@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { Collections } from "@nuxt/content";
+import type { grades } from "../index.vue";
 
 // определяем получение параметров роута через пропсы
 definePageMeta({ props: true });
 
 // получаем параметры роута черех пропсы
 const { collection, name } = defineProps<{
-  collection: keyof Collections;
+  collection: keyof typeof grades;
   name: string;
 }>();
 

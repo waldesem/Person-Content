@@ -1,15 +1,6 @@
-<script lang="ts">
-import type { Collections } from "@nuxt/content";
-
-const grades: { [K in keyof Collections]: string } = {
-  plus: "Грейд A+" as const,
-  a: "Грейд A" as const,
-  b: "Грейд B" as const,
-  archive: "Архивный" as const,
-};
-</script>
-
 <script setup lang="ts">
+import { grades } from "../index.vue";
+
 // определяем получение параметра роута через пропс и валидируем его
 definePageMeta({
   props: true,

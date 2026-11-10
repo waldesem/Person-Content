@@ -1,23 +1,37 @@
-<script setup lang="ts">
+<script lang="ts">
+import type { Collections } from "@nuxt/content";
 import type { ButtonProps, PageFeatureProps } from "@nuxt/ui";
 
+export const grades: { [K in keyof Collections]: string } = {
+  a: "Грейд A" as const,
+  b: "Грейд B" as const,
+  plus: "Грейд A+" as const,
+  archive: "Архивный" as const,
+};
+
+interface GradesPageFeatureProps extends PageFeatureProps {
+  title: (typeof grades)[keyof typeof grades];
+}
+</script>
+
+<script setup lang="ts">
 // Главная страница с грейдами
-const features = ref<PageFeatureProps[]>([
+const features = ref<GradesPageFeatureProps[]>([
   {
-    title: "Грейд А+",
-    description: "Топ-менеджмент категории A+",
+    title: grades.plus,
+    description: "Менеджмент категории " + grades.plus,
     icon: "i-lucide-a-large-small",
     to: "/grade/plus",
   },
   {
-    title: "Грейд А",
-    description: "Топ-менеджмент категории А",
+    title: grades.a,
+    description: "Менеджмент категории " + grades.a,
     icon: "i-lucide-letter-a",
     to: "/grade/a",
   },
   {
-    title: "Грейд В",
-    description: "Топ-менеджмент категории B",
+    title: grades.b,
+    description: "Менеджмент категории " + grades.b,
     icon: "i-lucide-letter-b",
     to: "/grade/b",
   },
@@ -25,7 +39,7 @@ const features = ref<PageFeatureProps[]>([
 
 const links = ref<ButtonProps[]>([
   {
-    label: "Архив",
+    label: grades.archive,
     to: "/grade/archive",
     color: "neutral",
     variant: "subtle",
@@ -35,7 +49,7 @@ const links = ref<ButtonProps[]>([
 </script>
 
 <template>
-  <UContainer class="my-[10vh]">
+  <UContainer class="flex items-center h-screen">
     <UPageSection
       icon="i-lucide-user-group"
       title="Топ-менеджент"
