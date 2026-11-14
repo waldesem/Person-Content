@@ -1,24 +1,20 @@
 <script setup lang="ts">
+import { grades } from "../index.vue";
+
 // определяем получение параметра роута через пропс и валидируем его
 definePageMeta({
   props: true,
   validate: (route) => {
-    const collParam = route.params.collection as string;
-    return collParam in CollGrades;
+    const param = route.params.collection as string;
+    return param in grades;
   },
 });
 
 // получаем параметры роута черех пропсы
-const { collection } = defineProps<{ collection: keyof typeof CollGrades }>();
+const { collection } = defineProps<{ collection: keyof typeof grades }>();
 
-// формируем имя грейда
-const graid = computed(() => CollGrades[collection]);
-
-const field = shallowRef("date" as "date" | "title");
-const direction = shallowRef("ASC" as "ASC" | "DESC");
-
-// заголовок страницы
-useHeadSafe({ title: graid.value });
+const field = shallowRef<"date" | "title">("date");
+const direction = shallowRef<"ASC" | "DESC">("ASC");
 
 // получаем список навигации из коллекции
 const { data, refresh } = await useAsyncData(() =>
@@ -28,7 +24,7 @@ const { data, refresh } = await useAsyncData(() =>
 
 <template>
   <UContainer>
-    <UPageHeader :title="graid">
+    <UPageHeader :title="grades[collection]">
       <template #links>
         <UTooltip text="Упорядочить">
           <USelect

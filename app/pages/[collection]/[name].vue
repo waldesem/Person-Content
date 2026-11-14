@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import type { grades } from "../index.vue";
+
 // определяем получение параметров роута через пропсы
 definePageMeta({ props: true });
 
 // получаем параметры роута черех пропсы
 const { collection, name } = defineProps<{
-  collection: keyof typeof CollGrades;
+  collection: keyof typeof grades;
   name: string;
 }>();
 
@@ -17,12 +19,10 @@ const { data } = await useAsyncData(`${collection}-${name}`, () =>
 if (!data.value) {
   throw createError({
     statusCode: 404,
-    statusMessage: "Страница не найдена",
+    message: "Страница не найдена",
     fatal: true,
   });
 }
-
-useHeadSafe({ title: data.value?.title || "Страница не найдена" });
 </script>
 
 <template>
